@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 300" role="img" aria-labelledby="title desc">
+  <title id="title">Bexhill 6th Form College Logo</title>
+  <desc id="desc">Stylized red curves above the Bexhill 6th Form College name.</desc>
+  <rect width="640" height="300" fill="#ffffff"/>
+  <g fill="none" stroke="#c13a3a" stroke-linecap="round" stroke-width="12">
+    <path d="M235 58 C 160 58, 160 90, 235 90 C 360 90, 395 58, 510 58" />
+    <path d="M235 108 C 160 108, 160 140, 235 140 C 360 140, 395 108, 510 108" />
+    <path d="M235 158 C 160 158, 160 190, 235 190 C 360 190, 395 158, 510 158" />
+    <path d="M232 55 L 232 191" />
+  </g>
+  <text x="320" y="257" text-anchor="middle" font-family="Arial, sans-serif" font-size="46" fill="#565656">
+    Bexhill 6th Form College
+  </text>
+</svg>

@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Banker Approval Panel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body class="admin-page">
+  <nav class="global-nav" aria-label="Primary">
+    <a href="/">Home</a>
+    <a href="/countries">All Countries</a>
+    <a href="/admin">Admin</a>
+    <a href="/banker">Banker</a>
+  </nav>
+  <main class="admin-layout">
+    <section id="bankerLoginPanel" class="card admin-card">
+      <h1>Banker Login</h1>
+      <p>Approve team deposit and withdrawal requests.</p>
+      <form id="bankerLoginForm" class="stack-form">
+        <input id="bankerPasswordInput" type="password" placeholder="Banker password" required />
+        <button type="submit">Login</button>
+      </form>
+      <p id="bankerLoginError" class="error-text"></p>
+    </section>
+
+    <section id="bankerPanel" class="hidden">
+      <header class="admin-header">
+        <h1>Banker Approval Queue</h1>
+        <div class="inline-actions">
+          <button id="bankerRefreshBtn" class="ghost-button">Refresh</button>
+          <button id="bankerLogoutBtn" class="ghost-button">Logout</button>
+        </div>
+      </header>
+
+      <section class="card admin-card wide">
+        <h2>Pending Requests</h2>
+        <div id="bankerPendingList" class="list-stack"></div>
+      </section>
+
+      <section class="card admin-card wide">
+        <h2>Recently Processed</h2>
+        <div id="bankerRecentList" class="list-stack"></div>
+      </section>
+    </section>
+  </main>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/banker.js"></script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+node_modules
+.DS_Store
+.env
+npm-debug.log*
+.server.pid
+server.log

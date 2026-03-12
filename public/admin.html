@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trading Simulation Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body class="admin-page">
+  <nav class="global-nav" aria-label="Primary">
+    <a href="/">Home</a>
+    <a href="/countries">All Countries</a>
+    <a href="/admin">Admin</a>
+    <a href="/banker">Banker</a>
+  </nav>
+  <main class="admin-layout">
+    <section id="loginPanel" class="card admin-card">
+      <h1>Admin Login</h1>
+      <p>Use the admin password from your `ADMIN_PASSWORD` environment variable.</p>
+      <form id="loginForm" class="stack-form">
+        <input id="passwordInput" type="password" placeholder="Admin password" required />
+        <button type="submit">Enter Admin Panel</button>
+      </form>
+      <p id="loginError" class="error-text"></p>
+    </section>
+
+    <section id="adminPanel" class="hidden">
+      <header class="admin-header">
+        <div class="admin-title-block">
+          <img src="/bexhill-logo.svg" alt="Bexhill 6th Form College" class="site-logo site-logo-small" />
+          <h1>Trading Simulation Control Center</h1>
+        </div>
+        <div class="inline-actions">
+          <a class="ghost-button" href="/" target="_blank" rel="noreferrer">Open Public Dashboard</a>
+          <a class="ghost-button" href="/countries" target="_blank" rel="noreferrer">Open Country Cards</a>
+          <a class="ghost-button" href="/banker" target="_blank" rel="noreferrer">Open Banker Panel</a>
+          <button id="logoutBtn" class="ghost-button">Logout</button>
+        </div>
+      </header>
+
+      <div class="admin-grid">
+        <section class="card admin-card">
+          <h2>Game Settings</h2>
+          <form id="metaForm" class="stack-form">
+            <input id="titleInput" placeholder="Game title" />
+            <input id="subtitleInput" placeholder="Subtitle" />
+            <textarea id="announcementInput" rows="3" placeholder="Announcement"></textarea>
+            <label class="checkbox-line">
+              <input id="pausedInput" type="checkbox" /> Pause game (buzzer state)
+            </label>
+            <button type="submit">Save Settings</button>
+          </form>
+          <div class="inline-actions wrap">
+            <button id="buzzerBtn" class="danger">Buzzer: Stop All</button>
+            <button id="resumeBtn" class="success">Resume Trading</button>
+            <button id="revealWinnerBtn" class="winner-btn">Reveal Winner</button>
+            <button id="hideWinnerBtn" class="ghost-button">Hide Reveal</button>
+          </div>
+        </section>
+
+        <section class="card admin-card">
+          <h2>Round Control</h2>
+          <div class="round-nav">
+            <button id="prevRoundBtn" class="ghost-button" type="button">Previous Round</button>
+            <div id="activeRoundLabel" class="round-active">Round 1</div>
+            <button id="nextRoundBtn" class="ghost-button" type="button">Next Round</button>
+          </div>
+          <div id="roundButtons" class="round-buttons"></div>
+          <form id="roundPricesForm" class="stack-form">
+            <label><strong>Square</strong><input id="rp_square" type="number" min="0" step="1" required /></label>
+            <label><strong>Circle</strong><input id="rp_circle" type="number" min="0" step="1" required /></label>
+            <label><strong>Equilateral Triangle</strong><input id="rp_equilateral_triangle" type="number" min="0" step="1" required /></label>
+            <label><strong>Isosceles Triangle</strong><input id="rp_isosceles_triangle" type="number" min="0" step="1" required /></label>
+            <label><strong>Semi Circle</strong><input id="rp_semi_circle" type="number" min="0" step="1" required /></label>
+            <button type="submit">Save Prices For Selected Round</button>
+          </form>
+          <p class="list-sub">Shape order matches your live cards: Square, Circle, Equilateral Triangle, Isosceles Triangle, Semi Circle.</p>
+        </section>
+
+        <section class="card admin-card wide">
+          <h2>Add Team</h2>
+          <form id="teamForm" class="stack-form">
+            <input id="teamNameInput" placeholder="Team / Country name" required />
+            <input id="teamFlagInput" placeholder="Image URL (optional)" />
+            <input id="teamPinInput" placeholder="PIN (optional, auto-generated if blank)" />
+            <button type="submit">Add Team</button>
+          </form>
+          <form id="teamImportForm" class="stack-form" style="margin-top:12px;">
+            <label for="teamImportFile"><strong>Bulk import teams</strong> (.csv, .xls, .xlsx)</label>
+            <input id="teamImportFile" type="file" accept=".csv,.xls,.xlsx" required />
+            <button type="submit" class="ghost-button">Upload Team File</button>
+            <p class="list-sub">Use column headers like <code>name</code> or <code>team</code>. Optional image column: <code>flagUrl</code>, <code>flag</code>, or <code>image</code>.</p>
+          </form>
+          <p class="list-sub">Team cash control: enter an amount and click Add Cash as many times as needed each round.</p>
+          <div id="teamList" class="list-stack"></div>
+        </section>
+
+        <section class="card admin-card wide">
+          <h2>Recent Activity</h2>
+          <div id="txList" class="list-stack"></div>
+          <div class="inline-actions wrap">
+            <button id="exportResultsBtn" class="winner-btn">Export Results Spreadsheet</button>
+            <button id="resetKeepBtn" class="ghost-button">Reset Scores (Keep teams & shapes)</button>
+            <button id="resetAllBtn" class="danger">Reset Everything</button>
+          </div>
+        </section>
+      </div>
+      <p id="adminStatus" class="status-text"></p>
+    </section>
+  </main>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trading Simulation Live Board</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body class="public-page">
+  <div class="background-orb orb-a"></div>
+  <div class="background-orb orb-b"></div>
+  <nav class="global-nav" aria-label="Primary">
+    <a href="/">Home</a>
+    <a href="/countries">All Countries</a>
+    <a href="/admin">Admin</a>
+    <a href="/banker">Banker</a>
+  </nav>
+
+  <main class="layout">
+    <header class="top-bar">
+      <img src="/bexhill-logo.svg" alt="Bexhill 6th Form College" class="site-logo top-bar-logo" />
+      <button id="openAdminBtn" class="ghost-button top-login-btn" type="button">Admin Login</button>
+    </header>
+
+    <section>
+      <div class="section-header">
+        <h2>Live Shape Prices</h2>
+      </div>
+      <div id="shapesGrid" class="shape-grid"></div>
+    </section>
+
+    <section>
+      <div class="section-header">
+        <h2>Country Cards</h2>
+      </div>
+      <div id="teamCards" class="team-grid"></div>
+    </section>
+
+    <section id="leaderboardSection" class="hidden">
+      <div class="section-header">
+        <h2>Leaderboard</h2>
+        <p id="updatedAt" class="updated-at"></p>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Team</th>
+              <th>Cash</th>
+              <th>Shapes Traded</th>
+              <th>Accepted</th>
+              <th>Rejected</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboardBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <div id="winnerReveal" class="winner-reveal hidden">
+    <div class="winner-box">
+      <h2>Winner Reveal</h2>
+      <p id="winnerText"></p>
+    </div>
+  </div>
+
+  <div id="pausedOverlay" class="paused-overlay hidden">
+    <div class="paused-box">
+      <h2>Buzzer Active</h2>
+      <p>Stop immediately and wait for instructions.</p>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/public.js"></script>
+</body>
+</html>

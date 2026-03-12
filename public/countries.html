@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Country Cards</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body class="countries-page">
+  <nav class="global-nav" aria-label="Primary">
+    <a href="/">Home</a>
+    <a href="/countries">All Countries</a>
+    <a href="/admin">Admin</a>
+    <a href="/banker">Banker</a>
+  </nav>
+  <main class="countries-layout">
+    <header class="top-bar">
+      <img src="/bexhill-logo.svg" alt="Bexhill 6th Form College" class="site-logo top-bar-logo" />
+      <div class="inline-actions">
+        <span id="countriesRound" class="round-active">Round 1</span>
+        <a class="ghost-button" href="/banker">Banker</a>
+      </div>
+    </header>
+
+    <section class="card admin-card">
+      <div class="section-header">
+        <h2>Country Cards</h2>
+        <p id="countriesHint" class="list-sub">Tap your country card to open your secure team portal.</p>
+      </div>
+      <div id="countriesGrid" class="countries-grid"></div>
+    </section>
+  </main>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/countries.js"></script>
+</body>
+</html>

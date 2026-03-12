@@ -1,0 +1,112 @@
+{
+  "meta": {
+    "title": "Global Trading Simulation",
+    "subtitle": "Build shapes, trade smart, and grow your country's wealth.",
+    "roundLabel": "Round 1",
+    "announcement": "Welcome to the trading floor.",
+    "currentRound": 1,
+    "paused": false,
+    "buzzerCount": 0,
+    "revealWinner": false,
+    "winnerTeamId": "",
+    "winnerName": "",
+    "updatedAt": "2026-02-26T00:00:00.000Z"
+  },
+  "shapes": [
+    {
+      "id": "shape_square",
+      "name": "Square",
+      "kind": "square",
+      "price": 50,
+      "color": "#0b3c5d"
+    },
+    {
+      "id": "shape_circle",
+      "name": "Circle",
+      "kind": "circle",
+      "price": 70,
+      "color": "#328cc1"
+    },
+    {
+      "id": "shape_equilateral_triangle",
+      "name": "Equilateral Triangle",
+      "kind": "equilateral_triangle",
+      "price": 90,
+      "color": "#0f766e"
+    },
+    {
+      "id": "shape_isosceles_triangle",
+      "name": "Isosceles Triangle",
+      "kind": "isosceles_triangle",
+      "price": 85,
+      "color": "#b45309"
+    },
+    {
+      "id": "shape_semi_circle",
+      "name": "Semi Circle",
+      "kind": "semi_circle",
+      "price": 65,
+      "color": "#7c3aed"
+    }
+  ],
+  "rounds": [
+    {
+      "round": 1,
+      "label": "Round 1",
+      "prices": {
+        "square": 50,
+        "circle": 70,
+        "equilateral_triangle": 90,
+        "isosceles_triangle": 85,
+        "semi_circle": 65
+      }
+    },
+    {
+      "round": 2,
+      "label": "Round 2",
+      "prices": {
+        "square": 50,
+        "circle": 70,
+        "equilateral_triangle": 90,
+        "isosceles_triangle": 85,
+        "semi_circle": 65
+      }
+    },
+    {
+      "round": 3,
+      "label": "Round 3",
+      "prices": {
+        "square": 50,
+        "circle": 70,
+        "equilateral_triangle": 90,
+        "isosceles_triangle": 85,
+        "semi_circle": 65
+      }
+    },
+    {
+      "round": 4,
+      "label": "Round 4",
+      "prices": {
+        "square": 50,
+        "circle": 70,
+        "equilateral_triangle": 90,
+        "isosceles_triangle": 85,
+        "semi_circle": 65
+      }
+    },
+    {
+      "round": 5,
+      "label": "Round 5",
+      "prices": {
+        "square": 50,
+        "circle": 70,
+        "equilateral_triangle": 90,
+        "isosceles_triangle": 85,
+        "semi_circle": 65
+      }
+    }
+  ],
+  "teams": [],
+  "bankerRequests": [],
+  "transactions": []
+}
