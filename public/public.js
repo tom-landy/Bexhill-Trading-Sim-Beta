@@ -24,6 +24,7 @@ function initials(name) {
 function shapeKey(shape) {
   if (shape.kind) return shape.kind;
   const n = (shape.name || '').toLowerCase();
+  if (n.includes('rectangle')) return 'square';
   if (n.includes('square')) return 'square';
   if (n.includes('semi') && n.includes('circle')) return 'semi_circle';
   if (n.includes('equilateral')) return 'equilateral_triangle';

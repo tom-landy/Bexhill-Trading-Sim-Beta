@@ -52,6 +52,7 @@ function generateTeamPin() {
 
 function inferShapeKind(name = '') {
   const normalized = String(name).toLowerCase().replace(/\s+/g, '_');
+  if (normalized.includes('rectangle')) return 'square';
   if (normalized.includes('square')) return 'square';
   if (normalized.includes('semi') && normalized.includes('circle')) return 'semi_circle';
   if (normalized.includes('equilateral')) return 'equilateral_triangle';
@@ -63,11 +64,11 @@ function inferShapeKind(name = '') {
 
 function defaultShapes() {
   return [
-    { id: makeId('shape'), name: 'Square', kind: 'square', price: 50, color: '#0b3c5d' },
-    { id: makeId('shape'), name: 'Circle', kind: 'circle', price: 70, color: '#328cc1' },
-    { id: makeId('shape'), name: 'Equilateral Triangle', kind: 'equilateral_triangle', price: 90, color: '#0f766e' },
-    { id: makeId('shape'), name: 'Isosceles Triangle', kind: 'isosceles_triangle', price: 85, color: '#b45309' },
-    { id: makeId('shape'), name: 'Semi Circle', kind: 'semi_circle', price: 65, color: '#7c3aed' }
+    { id: makeId('shape'), name: 'Rectangle', kind: 'square', price: 300, color: '#0b3c5d' },
+    { id: makeId('shape'), name: 'Circle', kind: 'circle', price: 500, color: '#328cc1' },
+    { id: makeId('shape'), name: 'Triangle', kind: 'equilateral_triangle', price: 150, color: '#0f766e' },
+    { id: makeId('shape'), name: 'Isosceles Triangle', kind: 'isosceles_triangle', price: 300, color: '#b45309' },
+    { id: makeId('shape'), name: 'Semicircle', kind: 'semi_circle', price: 200, color: '#7c3aed' }
   ];
 }
 
@@ -82,11 +83,68 @@ function pricesFromShapes(shapeList = []) {
 
 function defaultRoundsFromShapes(shapeList = defaultShapes()) {
   const basePrices = pricesFromShapes(shapeList);
-  return Array.from({ length: 5 }, (_, idx) => ({
-    round: idx + 1,
-    label: `Round ${idx + 1}`,
-    prices: { ...basePrices }
-  }));
+  return [
+    {
+      round: 1,
+      label: 'Round 1',
+      prices: {
+        ...basePrices,
+        circle: 500,
+        semi_circle: 200,
+        equilateral_triangle: 150,
+        isosceles_triangle: 300,
+        square: 300
+      }
+    },
+    {
+      round: 2,
+      label: 'Round 2',
+      prices: {
+        ...basePrices,
+        circle: 1000,
+        semi_circle: 500,
+        equilateral_triangle: 50,
+        isosceles_triangle: 150,
+        square: 100
+      }
+    },
+    {
+      round: 3,
+      label: 'Round 3',
+      prices: {
+        ...basePrices,
+        circle: 1000,
+        semi_circle: 500,
+        equilateral_triangle: 50,
+        isosceles_triangle: 150,
+        square: 100
+      }
+    },
+    {
+      round: 4,
+      label: 'Round 4',
+      prices: {
+        ...basePrices,
+        circle: 1000,
+        semi_circle: 500,
+        equilateral_triangle: 50,
+        isosceles_triangle: 150,
+        square: 100
+      }
+    },
+    {
+      round: 5,
+      label: 'Round 5',
+      prices: {
+        ...basePrices,
+        circle: 1500,
+        semi_circle: 600,
+        equilateral_triangle: 450,
+        isosceles_triangle: 900,
+        square: 900
+      }
+    }
+  ];
 }
 
 function normalizeRound(inputRound = {}, roundNumber, fallbackPrices = {}) {
@@ -721,11 +779,11 @@ app.get('/api/admin/export/results.xlsx', requireAdmin, (req, res) => {
   const roundsSheet = (state.rounds || []).map((round) => ({
     Round: round.round,
     Label: round.label,
-    Square: round.prices && round.prices.square,
+    Rectangle: round.prices && round.prices.square,
     Circle: round.prices && round.prices.circle,
-    EquilateralTriangle: round.prices && round.prices.equilateral_triangle,
+    Triangle: round.prices && round.prices.equilateral_triangle,
     IsoscelesTriangle: round.prices && round.prices.isosceles_triangle,
-    SemiCircle: round.prices && round.prices.semi_circle
+    Semicircle: round.prices && round.prices.semi_circle
   }));
 
   const workbook = XLSX.utils.book_new();

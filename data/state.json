@@ -15,37 +15,37 @@
   "shapes": [
     {
       "id": "shape_square",
-      "name": "Square",
+      "name": "Rectangle",
       "kind": "square",
-      "price": 50,
+      "price": 300,
       "color": "#0b3c5d"
     },
     {
       "id": "shape_circle",
       "name": "Circle",
       "kind": "circle",
-      "price": 70,
+      "price": 500,
       "color": "#328cc1"
     },
     {
       "id": "shape_equilateral_triangle",
-      "name": "Equilateral Triangle",
+      "name": "Triangle",
       "kind": "equilateral_triangle",
-      "price": 90,
+      "price": 150,
       "color": "#0f766e"
     },
     {
       "id": "shape_isosceles_triangle",
       "name": "Isosceles Triangle",
       "kind": "isosceles_triangle",
-      "price": 85,
+      "price": 300,
       "color": "#b45309"
     },
     {
       "id": "shape_semi_circle",
-      "name": "Semi Circle",
+      "name": "Semicircle",
       "kind": "semi_circle",
-      "price": 65,
+      "price": 200,
       "color": "#7c3aed"
     }
   ],
@@ -54,55 +54,55 @@
       "round": 1,
       "label": "Round 1",
       "prices": {
-        "square": 50,
-        "circle": 70,
-        "equilateral_triangle": 90,
-        "isosceles_triangle": 85,
-        "semi_circle": 65
+        "square": 300,
+        "circle": 500,
+        "equilateral_triangle": 150,
+        "isosceles_triangle": 300,
+        "semi_circle": 200
       }
     },
     {
       "round": 2,
       "label": "Round 2",
       "prices": {
-        "square": 50,
-        "circle": 70,
-        "equilateral_triangle": 90,
-        "isosceles_triangle": 85,
-        "semi_circle": 65
+        "square": 100,
+        "circle": 1000,
+        "equilateral_triangle": 50,
+        "isosceles_triangle": 150,
+        "semi_circle": 500
       }
     },
     {
       "round": 3,
       "label": "Round 3",
       "prices": {
-        "square": 50,
-        "circle": 70,
-        "equilateral_triangle": 90,
-        "isosceles_triangle": 85,
-        "semi_circle": 65
+        "square": 100,
+        "circle": 1000,
+        "equilateral_triangle": 50,
+        "isosceles_triangle": 150,
+        "semi_circle": 500
       }
     },
     {
       "round": 4,
       "label": "Round 4",
       "prices": {
-        "square": 50,
-        "circle": 70,
-        "equilateral_triangle": 90,
-        "isosceles_triangle": 85,
-        "semi_circle": 65
+        "square": 100,
+        "circle": 1000,
+        "equilateral_triangle": 50,
+        "isosceles_triangle": 150,
+        "semi_circle": 500
       }
     },
     {
       "round": 5,
       "label": "Round 5",
       "prices": {
-        "square": 50,
-        "circle": 70,
-        "equilateral_triangle": 90,
-        "isosceles_triangle": 85,
-        "semi_circle": 65
+        "square": 900,
+        "circle": 1500,
+        "equilateral_triangle": 450,
+        "isosceles_triangle": 900,
+        "semi_circle": 600
       }
     }
   ],

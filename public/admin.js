@@ -56,6 +56,12 @@ function formatMoney(value) {
   return `£${Number(value || 0).toLocaleString()}`;
 }
 
+function maskSecret(secret) {
+  const text = String(secret || '');
+  if (!text) return 'Not set';
+  return '•'.repeat(Math.max(4, text.length));
+}
+
 function setStatus(message) {
   adminStatus.textContent = message;
 }
@@ -125,9 +131,10 @@ function render(state) {
         <strong>${team.name}</strong>
         <span>${formatMoney(team.cash)}</span>
       </div>
-      <div class="list-sub">PIN: ${team.pin || 'Not set'}</div>
+      <div class="list-sub">PIN: <span data-pin-value="${team.id}">${maskSecret(team.pin)}</span></div>
       <div class="inline-actions wrap" style="margin-top:8px;">
         <input data-team-cash-input="${team.id}" type="number" min="0" step="1" value="10" style="max-width:120px;" />
+        <button data-action="toggle-pin" data-id="${team.id}" class="ghost-button" type="button">Show PIN</button>
         <button data-action="add-cash" data-id="${team.id}">Add Cash</button>
         <button data-action="edit-team" data-id="${team.id}" class="ghost-button">Edit</button>
         <button data-action="delete-team" data-id="${team.id}" class="danger">Delete</button>
@@ -169,6 +176,18 @@ teamList.addEventListener('click', async (event) => {
   if (!action || !id) return;
 
   try {
+    if (action === 'toggle-pin') {
+      const current = latestState.teams.find((team) => team.id === id);
+      if (!current) return;
+      const pinEl = teamList.querySelector(`[data-pin-value="${id}"]`);
+      if (!(pinEl instanceof HTMLElement)) return;
+      const showing = pinEl.dataset.visible === 'true';
+      pinEl.textContent = showing ? maskSecret(current.pin) : (current.pin || 'Not set');
+      pinEl.dataset.visible = showing ? 'false' : 'true';
+      target.textContent = showing ? 'Show PIN' : 'Hide PIN';
+      return;
+    }
+
     if (action === 'edit-team') {
       const current = latestState.teams.find((team) => team.id === id);
       if (!current) return;

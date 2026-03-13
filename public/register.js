@@ -28,6 +28,12 @@ function setStatus(message) {
   registerStatus.textContent = message;
 }
 
+function maskSecret(secret) {
+  const text = String(secret || '');
+  if (!text) return 'Not set';
+  return '•'.repeat(Math.max(4, text.length));
+}
+
 function renderSavedTeam() {
   const team = readSavedTeam();
   if (!team) {
@@ -44,15 +50,28 @@ function renderSavedTeam() {
       ${team.flagUrl ? `<img class="team-image" src="${team.flagUrl}" alt="${team.name}" />` : `<div class="team-fallback">OK</div>`}
       <h3>${team.name}</h3>
       <div class="list-sub">Team ID: ${team.id}</div>
-      <div class="list-sub">PIN: ${team.pin}</div>
+      <div class="list-sub">PIN: <span id="savedTeamPin" data-visible="false">${maskSecret(team.pin)}</span></div>
       <div class="inline-actions wrap">
         <a class="ghost-button" href="/team/${team.id}">Open Team Portal</a>
+        <button id="toggleSavedPin" class="ghost-button" type="button">Show PIN</button>
         <button id="deleteRegisteredTeam" class="danger" type="button">Delete This Team</button>
       </div>
     </article>
   `;
 
+  const toggleButton = document.getElementById('toggleSavedPin');
   const deleteButton = document.getElementById('deleteRegisteredTeam');
+  const pinEl = document.getElementById('savedTeamPin');
+
+  if (toggleButton && pinEl) {
+    toggleButton.addEventListener('click', () => {
+      const showing = pinEl.dataset.visible === 'true';
+      pinEl.textContent = showing ? maskSecret(team.pin) : (team.pin || 'Not set');
+      pinEl.dataset.visible = showing ? 'false' : 'true';
+      toggleButton.textContent = showing ? 'Show PIN' : 'Hide PIN';
+    });
+  }
+
   if (deleteButton) {
     deleteButton.addEventListener('click', async () => {
       if (!window.confirm('Delete this team and its uploaded image?')) return;
