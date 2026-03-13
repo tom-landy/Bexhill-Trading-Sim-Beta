@@ -35,9 +35,12 @@ function renderTeam(team) {
   teamNameEl.textContent = team.name;
   teamRoundEl.textContent = team.meta.roundLabel;
   teamBalanceEl.textContent = formatMoney(team.bankBalance);
-  teamAssetsEl.textContent = `Shapes traded: ${team.assets.shapesTraded} | Accepted: ${team.assets.accepted} | Rejected: ${team.assets.rejected}`;
-  teamRequestsList.innerHTML = '';
   const requests = Array.isArray(team.requests) ? team.requests : [];
+  const pendingCount = requests.filter((request) => request.status === 'pending').length;
+  const approvedCount = requests.filter((request) => request.status === 'approved').length;
+  const rejectedCount = requests.filter((request) => request.status === 'rejected').length;
+  teamAssetsEl.textContent = `Banker requests: ${requests.length} | Pending: ${pendingCount} | Approved: ${approvedCount} | Rejected: ${rejectedCount}`;
+  teamRequestsList.innerHTML = '';
   if (!requests.length) {
     teamRequestsList.innerHTML = '<article class=\"list-item\"><div class=\"list-sub\">No requests yet</div></article>';
     return;

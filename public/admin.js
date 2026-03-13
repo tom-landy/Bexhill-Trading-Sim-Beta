@@ -152,6 +152,7 @@ function render(state) {
         <button data-action="toggle-pin" data-id="${team.id}" class="ghost-button" type="button">Show PIN</button>
         <button data-action="add-cash" data-id="${team.id}">Add Cash</button>
         <button data-action="edit-team" data-id="${team.id}" class="ghost-button">Edit</button>
+        <button data-action="delete-flag" data-id="${team.id}" class="ghost-button" type="button">Delete Flag</button>
         <button data-action="delete-team" data-id="${team.id}" class="danger">Delete</button>
       </div>
     `;
@@ -225,6 +226,12 @@ teamList.addEventListener('click', async (event) => {
       }
       await api(`/api/admin/teams/${id}/adjust-cash`, 'POST', { amount, reason: 'Round cash add' });
       setStatus('Cash adjusted');
+    }
+
+    if (action === 'delete-flag') {
+      if (!window.confirm('Remove this team image/flag?')) return;
+      await api(`/api/admin/teams/${id}/flag`, 'DELETE');
+      setStatus('Flag removed');
     }
 
     if (action === 'delete-team') {

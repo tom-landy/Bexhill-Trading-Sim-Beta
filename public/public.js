@@ -73,7 +73,7 @@ function render(state) {
 
   if (meta.revealWinner && winner) {
     winnerRevealEl.classList.remove('hidden');
-    winnerTextEl.textContent = `${winner.name} wins with ${formatMoney(winner.cash)} and ${winner.traded || 0} shapes traded.`;
+    winnerTextEl.textContent = `${winner.name} wins with ${formatMoney(winner.cash)}.`;
   } else {
     winnerRevealEl.classList.add('hidden');
     winnerTextEl.textContent = '';
@@ -114,10 +114,8 @@ function render(state) {
     const statsMarkup = meta.revealWinner
       ? `
       <div class="money">${formatMoney(team.cash)}</div>
-      <div>Shapes Traded: ${team.traded || 0}</div>
-      <div>Accepted: ${team.accepted || 0} | Rejected: ${team.rejected || 0}</div>
     `
-      : `<div class="list-sub">Performance hidden until winner reveal</div>`;
+      : ``;
 
     card.innerHTML = `
       ${imageSection}
@@ -137,9 +135,6 @@ function render(state) {
       <td>#${team.rank}</td>
       <td>${team.name}</td>
       <td>${formatMoney(team.cash)}</td>
-      <td>${team.traded || 0}</td>
-      <td>${team.accepted || 0}</td>
-      <td>${team.rejected || 0}</td>
     `;
     leaderboardBodyEl.appendChild(row);
   });

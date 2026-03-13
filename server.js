@@ -1034,6 +1034,20 @@ app.put('/api/admin/teams/:teamId', requireAdmin, (req, res) => {
   res.json({ ok: true, team });
 });
 
+app.delete('/api/admin/teams/:teamId/flag', requireAdmin, (req, res) => {
+  const team = state.teams.find((item) => item.id === req.params.teamId);
+  if (!team) {
+    return res.status(404).json({ error: 'Team not found' });
+  }
+
+  removeTeamUpload(team.flagUrl);
+  team.flagUrl = '';
+
+  saveState();
+  broadcastState();
+  res.json({ ok: true, team });
+});
+
 app.post('/api/admin/teams/:teamId/adjust-cash', requireAdmin, (req, res) => {
   const team = state.teams.find((item) => item.id === req.params.teamId);
   if (!team) {
