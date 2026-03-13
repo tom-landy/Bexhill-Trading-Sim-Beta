@@ -201,6 +201,7 @@ h3 {
   width: 92%;
   height: 92%;
   object-fit: contain;
+  filter: brightness(0) invert(1);
 }
 
 .shape-fallback {
