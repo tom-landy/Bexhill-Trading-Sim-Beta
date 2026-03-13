@@ -142,8 +142,6 @@ function render(state) {
       </div>
       <div class="list-sub">PIN: ${team.pin || 'Not set'}</div>
       <div class="inline-actions wrap" style="margin-top:8px;">
-        <input data-team-cash-input="${team.id}" type="number" min="0" step="1" value="10" style="max-width:120px;" />
-        <button data-action="add-cash" data-id="${team.id}">Add Cash</button>
         <button data-action="edit-team" data-id="${team.id}" class="ghost-button">Edit Name</button>
         <button data-action="delete-flag" data-id="${team.id}" class="ghost-button" type="button">Delete Flag</button>
         <button data-action="delete-team" data-id="${team.id}" class="danger">Delete</button>
@@ -196,17 +194,6 @@ teamList.addEventListener('click', async (event) => {
       if (pin === null) return;
       await api(`/api/admin/teams/${id}`, 'PUT', { name, flagUrl, pin });
       setStatus('Team updated');
-    }
-
-    if (action === 'add-cash') {
-      const input = teamList.querySelector(`[data-team-cash-input="${id}"]`);
-      const amount = Number(input && input.value);
-      if (!Number.isFinite(amount) || amount <= 0) {
-        setStatus('Enter a valid positive cash amount');
-        return;
-      }
-      await api(`/api/admin/teams/${id}/adjust-cash`, 'POST', { amount, reason: 'Round cash add' });
-      setStatus('Cash adjusted');
     }
 
     if (action === 'delete-flag') {
