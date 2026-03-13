@@ -32,6 +32,13 @@ const ALLOWED_SHAPE_KINDS = new Set([
   'semi_circle'
 ]);
 const ROUND_SHAPE_ORDER = ['square', 'circle', 'equilateral_triangle', 'isosceles_triangle', 'semi_circle'];
+const LEGACY_PLACEHOLDER_PRICES = {
+  square: 50,
+  circle: 70,
+  equilateral_triangle: 90,
+  isosceles_triangle: 85,
+  semi_circle: 65
+};
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -185,6 +192,52 @@ function defaultState() {
     teams: [],
     bankerRequests: [],
     transactions: []
+  };
+}
+
+function canonicalShapeName(kind) {
+  if (kind === 'square') return 'Rectangle';
+  if (kind === 'circle') return 'Circle';
+  if (kind === 'equilateral_triangle') return 'Triangle';
+  if (kind === 'isosceles_triangle') return 'Isosceles Triangle';
+  if (kind === 'semi_circle') return 'Semicircle';
+  return 'Shape';
+}
+
+function pricesMatchLegacyPlaceholder(prices = {}) {
+  return ROUND_SHAPE_ORDER.every((kind) => Number(prices[kind]) === LEGACY_PLACEHOLDER_PRICES[kind]);
+}
+
+function migrateLegacyConfig(parsedState, shapes, rounds) {
+  let changed = false;
+  const migratedShapes = shapes.map((shape) => {
+    const canonicalName = canonicalShapeName(shape.kind);
+    if (shape.name === canonicalName) return shape;
+    if (
+      (shape.kind === 'square' && shape.name === 'Square') ||
+      (shape.kind === 'equilateral_triangle' && shape.name === 'Equilateral Triangle') ||
+      (shape.kind === 'semi_circle' && shape.name === 'Semi Circle')
+    ) {
+      changed = true;
+      return { ...shape, name: canonicalName };
+    }
+    return shape;
+  });
+
+  const shouldReplaceRounds = rounds.length === 5 && rounds.every((round) => pricesMatchLegacyPlaceholder(round.prices));
+  if (shouldReplaceRounds) {
+    changed = true;
+  }
+
+  const migratedRounds = shouldReplaceRounds ? defaultRoundsFromShapes(migratedShapes) : rounds;
+
+  return {
+    changed,
+    state: {
+      ...parsedState,
+      shapes: migratedShapes,
+      rounds: migratedRounds
+    }
   };
 }
 
@@ -360,9 +413,13 @@ function loadState() {
       ? Math.floor(currentRoundCandidate)
       : 1;
 
-    return {
+    const migrated = migrateLegacyConfig(parsed, shapes, rounds);
+    const migratedShapes = migrated.state.shapes || shapes;
+    const migratedRounds = migrated.state.rounds || rounds;
+
+    const finalState = {
       ...defaults,
-      ...parsed,
+      ...migrated.state,
       meta: {
         ...defaults.meta,
         ...(parsed.meta || {}),
@@ -370,11 +427,17 @@ function loadState() {
         roundLabel: `Round ${currentRound}`
       },
       teams: Array.isArray(parsed.teams) ? parsed.teams.map(normalizeTeam) : [],
-      shapes,
-      rounds,
+      shapes: migratedShapes,
+      rounds: migratedRounds,
       bankerRequests: Array.isArray(parsed.bankerRequests) ? parsed.bankerRequests : [],
       transactions: Array.isArray(parsed.transactions) ? parsed.transactions : []
     };
+
+    if (migrated.changed) {
+      fs.writeFileSync(STATE_PATH, JSON.stringify(finalState, null, 2), 'utf8');
+    }
+
+    return finalState;
   } catch (error) {
     console.error('Failed to read state.json, using defaults:', error.message);
     return defaultState();
