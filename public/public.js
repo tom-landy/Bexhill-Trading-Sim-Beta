@@ -38,6 +38,9 @@ function shapeSvg(shape) {
   const key = shapeKey(shape);
   const stroke = 'rgba(255,255,255,0.95)';
 
+  if (key === 'square') {
+    return `<svg viewBox="0 0 100 100" class="shape-svg"><rect x="18" y="28" width="64" height="44" fill="none" stroke="${stroke}" stroke-width="6"/></svg>`;
+  }
   if (key === 'circle') {
     return `<svg viewBox="0 0 100 100" class="shape-svg"><circle cx="50" cy="50" r="26" fill="none" stroke="${stroke}" stroke-width="6"/></svg>`;
   }
@@ -50,12 +53,12 @@ function shapeSvg(shape) {
   if (key === 'semi_circle') {
     return `<svg viewBox="0 0 100 100" class="shape-svg"><path d="M20,66 A30,30 0 0 1 80,66" fill="none" stroke="${stroke}" stroke-width="6"/><line x1="20" y1="66" x2="80" y2="66" stroke="${stroke}" stroke-width="6"/></svg>`;
   }
-  return `<svg viewBox="0 0 100 100" class="shape-svg"><rect x="24" y="24" width="52" height="52" fill="none" stroke="${stroke}" stroke-width="6"/></svg>`;
+  return `<svg viewBox="0 0 100 100" class="shape-svg"><rect x="18" y="28" width="64" height="44" fill="none" stroke="${stroke}" stroke-width="6"/></svg>`;
 }
 
 function shapeImagePath(shape) {
   const key = shapeKey(shape);
-  if (key === 'square') return '/images/square.png';
+  if (key === 'square') return '';
   if (key === 'circle') return '/images/circle.png';
   if (key === 'equilateral_triangle') return '/images/etriangle.png';
   if (key === 'isosceles_triangle') return '/images/itriangle.png';

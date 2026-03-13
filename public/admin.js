@@ -62,6 +62,15 @@ function maskSecret(secret) {
   return '•'.repeat(Math.max(4, text.length));
 }
 
+function initials(name) {
+  return String(name || '')
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0].toUpperCase())
+    .join('') || '?';
+}
+
 function setStatus(message) {
   adminStatus.textContent = message;
 }
@@ -126,9 +135,15 @@ function render(state) {
   state.teams.forEach((team) => {
     const row = document.createElement('article');
     row.className = 'list-item';
+    const imageSection = team.flagUrl
+      ? `<img class="admin-team-thumb" src="${team.flagUrl}" alt="${team.name}" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');" /><div class="admin-team-thumb admin-team-fallback hidden">${initials(team.name)}</div>`
+      : `<div class="admin-team-thumb admin-team-fallback">${initials(team.name)}</div>`;
     row.innerHTML = `
       <div class="list-head">
-        <strong>${team.name}</strong>
+        <div class="admin-team-heading">
+          ${imageSection}
+          <strong>${team.name}</strong>
+        </div>
         <span>${formatMoney(team.cash)}</span>
       </div>
       <div class="list-sub">PIN: <span data-pin-value="${team.id}">${maskSecret(team.pin)}</span></div>
