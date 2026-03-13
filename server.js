@@ -2,6 +2,7 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const http = require('http');
+const crypto = require('crypto');
 const multer = require('multer');
 const XLSX = require('xlsx');
 const { Server } = require('socket.io');
@@ -17,7 +18,11 @@ const DEFAULT_DATA_DIR = path.join(__dirname, 'data');
 const DATA_ROOT = process.env.RENDER_DISK_PATH || process.env.DATA_DIR || DEFAULT_DATA_DIR;
 const STATE_PATH = process.env.STATE_PATH || path.join(DATA_ROOT, 'state.json');
 const DATA_DIR = path.dirname(STATE_PATH);
-const upload = multer({ storage: multer.memoryStorage() });
+const TEAM_UPLOADS_DIR = path.join(DATA_DIR, 'team-uploads');
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 }
+});
 
 const ALLOWED_SHAPE_KINDS = new Set([
   'square',
@@ -31,6 +36,7 @@ const ROUND_SHAPE_ORDER = ['square', 'circle', 'equilateral_triangle', 'isoscele
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/images', express.static(path.join(__dirname, 'images')));
+app.use('/uploads', express.static(TEAM_UPLOADS_DIR));
 
 function makeId(prefix) {
   return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
@@ -127,6 +133,47 @@ function defaultState() {
 function ensureDataDir() {
   if (!fs.existsSync(DATA_DIR)) {
     fs.mkdirSync(DATA_DIR, { recursive: true });
+  }
+}
+
+function ensureUploadsDir() {
+  ensureDataDir();
+  if (!fs.existsSync(TEAM_UPLOADS_DIR)) {
+    fs.mkdirSync(TEAM_UPLOADS_DIR, { recursive: true });
+  }
+}
+
+function safeUploadExt(fileName = '', mimeType = '') {
+  const ext = path.extname(String(fileName || '')).toLowerCase();
+  if (['.png', '.jpg', '.jpeg', '.gif', '.webp'].includes(ext)) return ext;
+  if (mimeType === 'image/png') return '.png';
+  if (mimeType === 'image/jpeg') return '.jpg';
+  if (mimeType === 'image/gif') return '.gif';
+  if (mimeType === 'image/webp') return '.webp';
+  return '';
+}
+
+function saveTeamUpload(file) {
+  if (!file || !file.buffer) return '';
+
+  const ext = safeUploadExt(file.originalname, file.mimetype);
+  if (!ext) {
+    throw new Error('Image must be PNG, JPG, GIF, or WEBP');
+  }
+
+  ensureUploadsDir();
+  const fileName = `${Date.now()}-${crypto.randomBytes(6).toString('hex')}${ext}`;
+  fs.writeFileSync(path.join(TEAM_UPLOADS_DIR, fileName), file.buffer);
+  return `/uploads/${fileName}`;
+}
+
+function removeTeamUpload(flagUrl = '') {
+  const normalized = String(flagUrl || '').trim();
+  if (!normalized.startsWith('/uploads/')) return;
+
+  const target = path.join(TEAM_UPLOADS_DIR, path.basename(normalized));
+  if (fs.existsSync(target) && fs.statSync(target).isFile()) {
+    fs.unlinkSync(target);
   }
 }
 
@@ -312,6 +359,24 @@ function saveState() {
   fs.writeFileSync(STATE_PATH, JSON.stringify(state, null, 2), 'utf8');
 }
 
+function removeTeamById(teamId) {
+  const index = state.teams.findIndex((item) => item.id === teamId);
+  if (index === -1) return null;
+
+  const [removed] = state.teams.splice(index, 1);
+  state.transactions = state.transactions.filter((txn) => txn.teamId !== removed.id);
+  state.bankerRequests = state.bankerRequests.filter((request) => request.teamId !== removed.id);
+
+  if (state.meta.winnerTeamId === removed.id) {
+    state.meta.winnerTeamId = '';
+    state.meta.winnerName = '';
+    state.meta.revealWinner = false;
+  }
+
+  removeTeamUpload(removed.flagUrl);
+  return removed;
+}
+
 function rankTeams(teams) {
   return [...teams]
     .sort((a, b) => {
@@ -479,6 +544,62 @@ app.post('/api/team/:teamId/transaction', requireTeamPin, (req, res) => {
   saveState();
   broadcastState();
   res.json({ ok: true, request, team: teamState(req.team) });
+});
+
+app.post('/api/public/teams', upload.single('image'), (req, res) => {
+  const name = String((req.body && req.body.name) || '').trim();
+  const pin = String((req.body && req.body.pin) || '').trim();
+
+  if (!name) {
+    return res.status(400).json({ error: 'Team name is required' });
+  }
+
+  if (state.teams.some((team) => team.name.toLowerCase() === name.toLowerCase())) {
+    return res.status(400).json({ error: 'A team with that name already exists' });
+  }
+
+  let flagUrl = '';
+  try {
+    flagUrl = saveTeamUpload(req.file);
+  } catch (error) {
+    return res.status(400).json({ error: error.message });
+  }
+
+  const team = {
+    id: makeId('team'),
+    name,
+    flagUrl,
+    pin: pin || generateTeamPin(),
+    cash: 0,
+    accepted: 0,
+    rejected: 0,
+    traded: 0
+  };
+
+  state.teams.push(team);
+  saveState();
+  broadcastState();
+
+  res.status(201).json({
+    ok: true,
+    team: {
+      id: team.id,
+      name: team.name,
+      flagUrl: team.flagUrl,
+      pin: team.pin
+    }
+  });
+});
+
+app.delete('/api/team/:teamId/self-delete', requireTeamPin, (req, res) => {
+  const removed = removeTeamById(req.team.id);
+  if (!removed) {
+    return res.status(404).json({ error: 'Team not found' });
+  }
+
+  saveState();
+  broadcastState();
+  res.json({ ok: true });
 });
 
 app.post('/api/admin/login', (req, res) => {
@@ -822,13 +943,10 @@ app.post('/api/admin/teams/:teamId/adjust-cash', requireAdmin, (req, res) => {
 });
 
 app.delete('/api/admin/teams/:teamId', requireAdmin, (req, res) => {
-  const index = state.teams.findIndex((item) => item.id === req.params.teamId);
-  if (index === -1) {
+  const removed = removeTeamById(req.params.teamId);
+  if (!removed) {
     return res.status(404).json({ error: 'Team not found' });
   }
-
-  const [removed] = state.teams.splice(index, 1);
-  state.transactions = state.transactions.filter((txn) => txn.teamId !== removed.id);
 
   saveState();
   broadcastState();
@@ -1072,6 +1190,10 @@ app.get('/countries', (req, res) => {
 
 app.get('/banker', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'banker.html'));
+});
+
+app.get('/register', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'register.html'));
 });
 
 app.get('/team/:teamId', (req, res) => {

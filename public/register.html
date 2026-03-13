@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register Team</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body class="register-page">
+  <nav class="global-nav" aria-label="Primary">
+    <a href="/">Home</a>
+    <a href="/countries">All Countries</a>
+    <a href="/register">Register Team</a>
+    <a href="/admin">Admin</a>
+    <a href="/banker">Banker</a>
+  </nav>
+  <main class="register-layout">
+    <section class="card admin-card">
+      <div class="section-header">
+        <h1>Register Your Team</h1>
+      </div>
+      <p class="list-sub">Enter your team name, upload an image, and choose a PIN for your portal.</p>
+      <form id="registerForm" class="stack-form" enctype="multipart/form-data">
+        <input id="registerName" name="name" placeholder="Team name" required />
+        <input id="registerPin" name="pin" type="password" placeholder="Team PIN (optional, auto-generated if blank)" />
+        <input id="registerImage" name="image" type="file" accept="image/png,image/jpeg,image/gif,image/webp" />
+        <button type="submit">Create Team</button>
+      </form>
+      <p id="registerStatus" class="status-text"></p>
+    </section>
+
+    <section class="card admin-card">
+      <div class="section-header">
+        <h2>Your Latest Submission</h2>
+      </div>
+      <div id="registeredTeamCard" class="hidden"></div>
+      <p id="registerEmpty" class="list-sub">No team created on this device yet.</p>
+    </section>
+  </main>
+
+  <script src="/register.js"></script>
+</body>
+</html>
