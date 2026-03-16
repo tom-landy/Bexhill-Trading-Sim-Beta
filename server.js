@@ -1331,6 +1331,10 @@ app.get('/register', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'register.html'));
 });
 
+app.get('/seating-plan', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'seating-plan.html'));
+});
+
 app.get('/team/:teamId', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'team.html'));
 });

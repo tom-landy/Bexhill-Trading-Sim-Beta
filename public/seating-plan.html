@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Seating Plan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body class="seating-page">
+  <nav class="global-nav" aria-label="Primary">
+    <a href="/">Home</a>
+    <a href="/countries">All Countries</a>
+    <a href="/register">Register Team</a>
+    <a href="/seating-plan">Seating Plan</a>
+    <a href="/admin">Admin</a>
+    <a href="/banker">Banker</a>
+  </nav>
+
+  <main class="seating-layout">
+    <section class="card admin-card seating-assign-card">
+      <div class="section-header">
+        <h1>Student Check-In</h1>
+      </div>
+      <p class="list-sub">Each student taps the button once to get a random table. Assignments stay balanced automatically.</p>
+      <div id="assignmentPanel" class="seating-assignment-panel">
+        <div class="seating-hero-label">Current Assignment</div>
+        <div id="assignmentDisplay" class="seating-assignment-display">Tap below to begin</div>
+        <div id="assignmentSubtext" class="list-sub">No student assigned yet</div>
+        <div class="inline-actions wrap">
+          <button id="assignStudentBtn" type="button">Assign Next Student</button>
+          <button id="undoAssignBtn" type="button" class="ghost-button">Undo Last</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="card admin-card">
+      <div class="section-header">
+        <h2>Setup</h2>
+      </div>
+      <p class="list-sub">Creates random teams with a maximum of 10 students per table and keeps the groups as even as possible if attendance is below 120.</p>
+
+      <form id="seatingForm" class="stack-form">
+        <label>
+          <strong>Expected attendees</strong>
+          <input id="attendeeCount" type="number" min="1" max="120" value="120" required />
+        </label>
+        <label>
+          <strong>Student names (optional, one per line)</strong>
+          <textarea id="studentNames" rows="10" placeholder="If you leave this blank, the page will generate Student 1, Student 2, Student 3..."></textarea>
+        </label>
+        <div class="inline-actions wrap">
+          <button type="submit">Reset and Generate Plan</button>
+          <button id="printPlanBtn" type="button" class="ghost-button">Print</button>
+        </div>
+      </form>
+      <p id="seatingStatus" class="status-text"></p>
+    </section>
+
+    <section class="card admin-card">
+      <div class="section-header">
+        <h2>Summary</h2>
+      </div>
+      <div id="seatingSummary" class="list-stack"></div>
+    </section>
+
+    <section class="card admin-card seating-results-card">
+      <div class="section-header">
+        <h2>Tables</h2>
+      </div>
+      <div id="tableGrid" class="seating-grid"></div>
+    </section>
+  </main>
+
+  <script src="/seating-plan.js"></script>
+</body>
+</html>

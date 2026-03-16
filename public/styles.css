@@ -69,6 +69,42 @@ h3 {
   gap: 18px;
 }
 
+.seating-layout {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px 18px 48px;
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 18px;
+}
+
+.seating-assign-card {
+  grid-column: 1 / -1;
+}
+
+.seating-assignment-panel {
+  margin-top: 10px;
+  padding: 16px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #0f766e, #155e75);
+  color: #fff;
+  display: grid;
+  gap: 10px;
+}
+
+.seating-hero-label {
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.85;
+}
+
+.seating-assignment-display {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2.8rem, 8vw, 5.6rem);
+  line-height: 1;
+}
+
 .hero,
 .card,
 .table-wrap {
@@ -581,6 +617,34 @@ button.winner-btn {
   color: #0f766e;
 }
 
+.seating-results-card {
+  grid-column: 1 / -1;
+}
+
+.seating-grid {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.seating-table-card {
+  min-height: 260px;
+  align-content: start;
+}
+
+.seating-student-list {
+  margin: 10px 0 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 6px;
+}
+
+.assigned-seat {
+  color: #0f766e;
+  font-weight: 700;
+}
+
 @media (max-width: 1200px) {
   .shape-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -593,10 +657,18 @@ button.winner-btn {
   .countries-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
+
+  .seating-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 900px) {
   .register-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .seating-layout {
     grid-template-columns: 1fr;
   }
 
@@ -625,6 +697,10 @@ button.winner-btn {
   .countries-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
+
+  .seating-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 620px) {
@@ -642,6 +718,10 @@ button.winner-btn {
   }
 
   .countries-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .seating-grid {
     grid-template-columns: 1fr;
   }
 }
