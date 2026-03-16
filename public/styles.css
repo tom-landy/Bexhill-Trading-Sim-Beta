@@ -84,12 +84,12 @@ h3 {
 
 .seating-assignment-panel {
   margin-top: 10px;
-  padding: 16px;
-  border-radius: 14px;
+  padding: 22px;
+  border-radius: 18px;
   background: linear-gradient(135deg, #0f766e, #155e75);
   color: #fff;
   display: grid;
-  gap: 10px;
+  gap: 14px;
 }
 
 .seating-hero-label {
@@ -101,7 +101,7 @@ h3 {
 
 .seating-assignment-display {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(2.8rem, 8vw, 5.6rem);
+  font-size: clamp(3.8rem, 10vw, 7rem);
   line-height: 1;
 }
 
@@ -435,6 +435,24 @@ button,
   text-decoration: none;
 }
 
+.seating-page button,
+.seating-page .ghost-button,
+.seating-page input,
+.seating-page textarea {
+  font-size: 1.1rem;
+}
+
+.seating-page button,
+.seating-page .ghost-button {
+  min-height: 58px;
+  padding: 14px 18px;
+}
+
+.seating-page input:not([type="checkbox"]),
+.seating-page textarea {
+  padding: 14px 16px;
+}
+
 button:hover,
 .ghost-button:hover {
   filter: brightness(0.95);
@@ -631,6 +649,18 @@ button.winner-btn {
 .seating-table-card {
   min-height: 260px;
   align-content: start;
+}
+
+.seating-group-red {
+  color: #991b1b;
+}
+
+.seating-group-blue {
+  color: #1d4ed8;
+}
+
+.seating-group-green {
+  color: #166534;
 }
 
 .seating-student-list {

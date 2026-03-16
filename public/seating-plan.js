@@ -11,6 +11,11 @@ const assignmentDisplay = document.getElementById('assignmentDisplay');
 const assignmentSubtext = document.getElementById('assignmentSubtext');
 
 const STORAGE_KEY = 'seating-plan-state-v1';
+const GROUP_LABELS = [
+  'Red 1', 'Red 2', 'Red 3', 'Red 4',
+  'Blue 1', 'Blue 2', 'Blue 3', 'Blue 4',
+  'Green 1', 'Green 2', 'Green 3', 'Green 4'
+];
 
 function setStatus(message) {
   seatingStatus.textContent = message;
@@ -65,6 +70,10 @@ function splitIntoTables(students) {
   return tables;
 }
 
+function groupLabel(index) {
+  return GROUP_LABELS[index] || `Group ${index + 1}`;
+}
+
 function buildSeatQueue(tables) {
   const queue = [];
   const maxSeats = Math.max(...tables.map((table) => table.length));
@@ -107,13 +116,13 @@ function renderSummary(tables, totalStudents) {
     </article>
     <article class="list-item">
       <div class="list-head">
-        <strong>Total tables</strong>
+        <strong>Total groups</strong>
         <span>${tables.length}</span>
       </div>
     </article>
     <article class="list-item">
       <div class="list-head">
-        <strong>Table sizes</strong>
+        <strong>Group sizes</strong>
         <span>${sizes.join(', ')}</span>
       </div>
     </article>
@@ -131,9 +140,11 @@ function renderTables(state) {
   state.tables.forEach((table, index) => {
     const card = document.createElement('article');
     card.className = 'team-card seating-table-card';
+    const label = groupLabel(index);
+    const colorClass = `seating-group-${label.split(' ')[0].toLowerCase()}`;
     card.innerHTML = `
-      <div class="list-head">
-        <strong>Table ${index + 1}</strong>
+      <div class="list-head ${colorClass}">
+        <strong>${label}</strong>
         <span>${counts[index + 1] || 0} / ${table.length} assigned</span>
       </div>
       <ol class="seating-student-list">
@@ -155,7 +166,7 @@ function renderAssignment(state) {
     return;
   }
 
-  assignmentDisplay.textContent = `Table ${last.table}`;
+  assignmentDisplay.textContent = groupLabel(last.table - 1);
   assignmentSubtext.textContent = `${last.student} -> Seat ${last.seat} • ${state.remaining.length} students left`;
 }
 
@@ -163,7 +174,7 @@ function renderState(state) {
   renderSummary(state.tables, state.totalStudents);
   renderTables(state);
   renderAssignment(state);
-  setStatus(`Plan ready: ${state.totalStudents} students across ${state.tables.length} tables.`);
+  setStatus(`Plan ready: ${state.totalStudents} students across ${state.tables.length} groups.`);
 }
 
 function generatePlan() {
