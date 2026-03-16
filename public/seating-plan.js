@@ -9,6 +9,7 @@ const assignStudentBtn = document.getElementById('assignStudentBtn');
 const undoAssignBtn = document.getElementById('undoAssignBtn');
 const assignmentDisplay = document.getElementById('assignmentDisplay');
 const assignmentSubtext = document.getElementById('assignmentSubtext');
+const assignmentPanel = document.getElementById('assignmentPanel');
 
 const STORAGE_KEY = 'seating-plan-state-v1';
 const GROUP_LABELS = [
@@ -72,6 +73,14 @@ function splitIntoTables(students) {
 
 function groupLabel(index) {
   return GROUP_LABELS[index] || `Group ${index + 1}`;
+}
+
+function groupColorClass(label = '') {
+  const color = String(label).split(' ')[0].toLowerCase();
+  if (color === 'red' || color === 'blue' || color === 'green') {
+    return `seating-assign-${color}`;
+  }
+  return 'seating-assign-neutral';
 }
 
 function buildSeatQueue(tables) {
@@ -163,11 +172,14 @@ function renderAssignment(state) {
   if (!last) {
     assignmentDisplay.textContent = 'Tap below to begin';
     assignmentSubtext.textContent = `${state.remaining.length} students waiting`;
+    assignmentPanel.className = 'seating-assignment-panel seating-assign-neutral';
     return;
   }
 
-  assignmentDisplay.textContent = groupLabel(last.table - 1);
+  const label = groupLabel(last.table - 1);
+  assignmentDisplay.textContent = label;
   assignmentSubtext.textContent = `${last.student} -> Seat ${last.seat} • ${state.remaining.length} students left`;
+  assignmentPanel.className = `seating-assignment-panel ${groupColorClass(label)}`;
 }
 
 function renderState(state) {
@@ -197,6 +209,7 @@ function assignNextStudent() {
   if (!state || !Array.isArray(state.remaining) || !state.remaining.length) {
     assignmentDisplay.textContent = 'All students assigned';
     assignmentSubtext.textContent = 'Reset the plan if attendance changes.';
+    assignmentPanel.className = 'seating-assignment-panel seating-assign-neutral';
     setStatus('All available seats have been assigned.');
     return;
   }
@@ -232,6 +245,7 @@ seatingForm.addEventListener('submit', (event) => {
     tableGrid.innerHTML = '';
     assignmentDisplay.textContent = 'Tap below to begin';
     assignmentSubtext.textContent = 'No student assigned yet';
+    assignmentPanel.className = 'seating-assignment-panel seating-assign-neutral';
   }
 });
 

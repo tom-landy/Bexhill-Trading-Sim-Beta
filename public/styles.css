@@ -84,12 +84,30 @@ h3 {
 
 .seating-assignment-panel {
   margin-top: 10px;
-  padding: 22px;
-  border-radius: 18px;
-  background: linear-gradient(135deg, #0f766e, #155e75);
+  padding: 28px;
+  border-radius: 22px;
   color: #fff;
   display: grid;
   gap: 14px;
+  min-height: 360px;
+  align-content: center;
+  transition: background 160ms ease;
+}
+
+.seating-assign-neutral {
+  background: linear-gradient(135deg, #0f766e, #155e75);
+}
+
+.seating-assign-red {
+  background: linear-gradient(135deg, #dc2626, #991b1b);
+}
+
+.seating-assign-blue {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+}
+
+.seating-assign-green {
+  background: linear-gradient(135deg, #16a34a, #166534);
 }
 
 .seating-hero-label {
@@ -101,7 +119,7 @@ h3 {
 
 .seating-assignment-display {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(3.8rem, 10vw, 7rem);
+  font-size: clamp(4.8rem, 12vw, 8.5rem);
   line-height: 1;
 }
 
@@ -444,8 +462,8 @@ button,
 
 .seating-page button,
 .seating-page .ghost-button {
-  min-height: 58px;
-  padding: 14px 18px;
+  min-height: 70px;
+  padding: 18px 22px;
 }
 
 .seating-page input:not([type="checkbox"]),
