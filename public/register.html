@@ -23,10 +23,9 @@
       <div class="section-header">
         <h1>Register Your Team</h1>
       </div>
-      <p class="list-sub">Enter your team name, upload an image, and choose a PIN for your portal.</p>
+      <p class="list-sub">Enter your team name and upload an image. The system will generate the team PIN automatically.</p>
       <form id="registerForm" class="stack-form" enctype="multipart/form-data">
         <input id="registerName" name="name" placeholder="Team name" required />
-        <input id="registerPin" name="pin" type="password" placeholder="Team PIN (optional, auto-generated if blank)" />
         <input id="registerImage" name="image" type="file" accept="image/png,image/jpeg,image/gif,image/webp" />
         <button type="submit">Create Team</button>
       </form>
@@ -39,6 +38,7 @@
       </div>
       <div id="registeredTeamCard" class="hidden"></div>
       <p id="registerEmpty" class="list-sub">No team created on this device yet.</p>
+      <p id="registerTimer" class="list-sub"></p>
     </section>
   </main>
 

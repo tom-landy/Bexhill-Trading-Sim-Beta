@@ -669,7 +669,6 @@ app.post('/api/team/:teamId/transaction', requireTeamPin, (req, res) => {
 
 app.post('/api/public/teams', upload.single('image'), (req, res) => {
   const name = String((req.body && req.body.name) || '').trim();
-  const pin = String((req.body && req.body.pin) || '').trim();
 
   if (!name) {
     return res.status(400).json({ error: 'Team name is required' });
@@ -690,7 +689,7 @@ app.post('/api/public/teams', upload.single('image'), (req, res) => {
     id: makeId('team'),
     name,
     flagUrl,
-    pin: pin || generateTeamPin(),
+    pin: generateTeamPin(),
     cash: 0,
     accepted: 0,
     rejected: 0,

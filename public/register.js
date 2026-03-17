@@ -1,12 +1,14 @@
 const registerForm = document.getElementById('registerForm');
 const registerName = document.getElementById('registerName');
-const registerPin = document.getElementById('registerPin');
 const registerImage = document.getElementById('registerImage');
 const registerStatus = document.getElementById('registerStatus');
 const registeredTeamCard = document.getElementById('registeredTeamCard');
 const registerEmpty = document.getElementById('registerEmpty');
+const registerTimer = document.getElementById('registerTimer');
 
 const STORAGE_KEY = 'trading-sim-registered-team';
+const LOCK_KEY = 'trading-sim-register-lock-until';
+const LOCK_MS = 2 * 60 * 1000;
 
 function readSavedTeam() {
   try {
@@ -24,6 +26,14 @@ function clearTeam() {
   localStorage.removeItem(STORAGE_KEY);
 }
 
+function readLockUntil() {
+  return Number(localStorage.getItem(LOCK_KEY) || 0);
+}
+
+function setLockUntil(timestamp) {
+  localStorage.setItem(LOCK_KEY, String(timestamp));
+}
+
 function setStatus(message) {
   registerStatus.textContent = message;
 }
@@ -32,6 +42,34 @@ function maskSecret(secret) {
   const text = String(secret || '');
   if (!text) return 'Not set';
   return '•'.repeat(Math.max(4, text.length));
+}
+
+function formatRemaining(ms) {
+  const totalSeconds = Math.max(0, Math.ceil(ms / 1000));
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${String(seconds).padStart(2, '0')}`;
+}
+
+function updateRegistrationAvailability() {
+  const savedTeam = readSavedTeam();
+  const lockUntil = readLockUntil();
+  const locked = lockUntil > Date.now();
+  const disabled = Boolean(savedTeam) || locked;
+
+  Array.from(registerForm.elements).forEach((field) => {
+    if (field instanceof HTMLElement) {
+      field.toggleAttribute('disabled', disabled);
+    }
+  });
+
+  if (savedTeam) {
+    registerTimer.textContent = 'This device has already registered a team. Delete it below if needed.';
+  } else if (locked) {
+    registerTimer.textContent = `This device can register again in ${formatRemaining(lockUntil - Date.now())}.`;
+  } else {
+    registerTimer.textContent = '';
+  }
 }
 
 function renderSavedTeam() {
@@ -89,6 +127,7 @@ function renderSavedTeam() {
         clearTeam();
         renderSavedTeam();
         setStatus('Team deleted');
+        updateRegistrationAvailability();
       } catch (error) {
         setStatus(error.message);
       }
@@ -103,7 +142,6 @@ registerForm.addEventListener('submit', async (event) => {
   try {
     const formData = new FormData();
     formData.append('name', registerName.value.trim());
-    formData.append('pin', registerPin.value.trim());
     const file = registerImage.files && registerImage.files[0];
     if (file) formData.append('image', file);
 
@@ -116,8 +154,10 @@ registerForm.addEventListener('submit', async (event) => {
     if (!response.ok) throw new Error(data.error || 'Unable to create team');
 
     saveTeam(data.team);
+    setLockUntil(Date.now() + LOCK_MS);
     registerForm.reset();
     renderSavedTeam();
+    updateRegistrationAvailability();
     setStatus(`Team created. Save the PIN for ${data.team.name}.`);
   } catch (error) {
     setStatus(error.message);
@@ -125,3 +165,5 @@ registerForm.addEventListener('submit', async (event) => {
 });
 
 renderSavedTeam();
+updateRegistrationAvailability();
+window.setInterval(updateRegistrationAvailability, 1000);
