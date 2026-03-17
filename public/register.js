@@ -34,6 +34,10 @@ function setLockUntil(timestamp) {
   localStorage.setItem(LOCK_KEY, String(timestamp));
 }
 
+function clearLock() {
+  localStorage.removeItem(LOCK_KEY);
+}
+
 function setStatus(message) {
   registerStatus.textContent = message;
 }
@@ -69,6 +73,26 @@ function updateRegistrationAvailability() {
     registerTimer.textContent = `This device can register again in ${formatRemaining(lockUntil - Date.now())}.`;
   } else {
     registerTimer.textContent = '';
+  }
+}
+
+async function syncSavedTeamWithServer() {
+  const savedTeam = readSavedTeam();
+  if (!savedTeam || !savedTeam.id) return;
+
+  try {
+    const response = await fetch('/api/state');
+    if (!response.ok) return;
+    const data = await response.json();
+    const teams = Array.isArray(data.teams) ? data.teams : [];
+    const exists = teams.some((team) => team.id === savedTeam.id);
+
+    if (!exists) {
+      clearTeam();
+      clearLock();
+    }
+  } catch {
+    // Keep local state if the server cannot be reached.
   }
 }
 
@@ -164,6 +188,8 @@ registerForm.addEventListener('submit', async (event) => {
   }
 });
 
-renderSavedTeam();
-updateRegistrationAvailability();
-window.setInterval(updateRegistrationAvailability, 1000);
+syncSavedTeamWithServer().finally(() => {
+  renderSavedTeam();
+  updateRegistrationAvailability();
+  window.setInterval(updateRegistrationAvailability, 1000);
+});
