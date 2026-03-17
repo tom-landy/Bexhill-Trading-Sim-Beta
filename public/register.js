@@ -13,6 +13,7 @@ const flagBrushSize = document.getElementById('flagBrushSize');
 const flagText = document.getElementById('flagText');
 const clearFlagBtn = document.getElementById('clearFlagBtn');
 const fillBackgroundBtn = document.getElementById('fillBackgroundBtn');
+const undoFlagBtn = document.getElementById('undoFlagBtn');
 
 const STORAGE_KEY = 'trading-sim-registered-team';
 const LOCK_KEY = 'trading-sim-register-lock-until';
@@ -26,6 +27,7 @@ let isDrawing = false;
 let canvasDirty = false;
 let dragPlacement = null;
 let canvasSnapshot = null;
+let canvasHistory = [];
 
 function readSavedTeam() {
   try {
@@ -80,6 +82,59 @@ function restoreCanvas(snapshot) {
   ctx.putImageData(snapshot, 0, 0);
 }
 
+function updateUndoButton() {
+  if (!undoFlagBtn) return;
+  undoFlagBtn.disabled = canvasHistory.length === 0;
+}
+
+function pushCanvasHistory() {
+  canvasHistory.push(snapshotCanvas());
+  if (canvasHistory.length > 30) {
+    canvasHistory.shift();
+  }
+  updateUndoButton();
+}
+
+function hexToRgb(value) {
+  const clean = value.replace('#', '');
+  const normalized = clean.length === 3
+    ? clean.split('').map((char) => char + char).join('')
+    : clean;
+
+  return {
+    r: Number.parseInt(normalized.slice(0, 2), 16),
+    g: Number.parseInt(normalized.slice(2, 4), 16),
+    b: Number.parseInt(normalized.slice(4, 6), 16)
+  };
+}
+
+function refreshCanvasDirtyState() {
+  const pixels = ctx.getImageData(0, 0, FLAG_CANVAS_WIDTH, FLAG_CANVAS_HEIGHT).data;
+  const background = hexToRgb(flagBackground.value);
+  let dirty = false;
+
+  for (let index = 0; index < pixels.length; index += 4) {
+    if (
+      pixels[index] !== background.r ||
+      pixels[index + 1] !== background.g ||
+      pixels[index + 2] !== background.b ||
+      pixels[index + 3] !== 255
+    ) {
+      dirty = true;
+      break;
+    }
+  }
+
+  canvasDirty = dirty;
+}
+
+function undoCanvasStep() {
+  if (!canvasHistory.length) return;
+  restoreCanvas(canvasHistory.pop());
+  refreshCanvasDirtyState();
+  updateUndoButton();
+}
+
 function canvasPosition(event) {
   const rect = flagCanvas.getBoundingClientRect();
   return {
@@ -94,6 +149,8 @@ function resetCanvas() {
   canvasDirty = false;
   dragPlacement = null;
   canvasSnapshot = null;
+  canvasHistory = [];
+  updateUndoButton();
 }
 
 function drawShape(tool, x, y) {
@@ -146,6 +203,7 @@ function beginDrawing(event) {
   }
 
   isDrawing = true;
+  pushCanvasHistory();
   ctx.beginPath();
   ctx.moveTo(x, y);
   ctx.lineCap = 'round';
@@ -175,6 +233,7 @@ function continueDrawing(event) {
 function endDrawing(event) {
   if (dragPlacement && flagTool.value !== 'draw') {
     restoreCanvas(canvasSnapshot);
+    pushCanvasHistory();
     drawShape(dragPlacement.tool, dragPlacement.x, dragPlacement.y);
     markCanvasDirty();
     dragPlacement = null;
@@ -370,9 +429,14 @@ clearFlagBtn.addEventListener('click', () => {
 });
 
 fillBackgroundBtn.addEventListener('click', () => {
+  pushCanvasHistory();
   ctx.fillStyle = flagBackground.value;
   ctx.fillRect(0, 0, FLAG_CANVAS_WIDTH, FLAG_CANVAS_HEIGHT);
   markCanvasDirty();
+});
+
+undoFlagBtn.addEventListener('click', () => {
+  undoCanvasStep();
 });
 
 syncSavedTeamWithServer().finally(() => {
