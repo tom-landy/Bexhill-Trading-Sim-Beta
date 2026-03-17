@@ -618,6 +618,18 @@ app.post('/api/team/login', (req, res) => {
   if (!pin || pin !== String(team.pin || '')) {
     return res.status(401).json({ error: 'Invalid PIN' });
   }
+
+  state.transactions.push({
+    id: makeId('txn'),
+    timestamp: nowIso(),
+    type: 'team_portal_login',
+    teamId: team.id,
+    teamName: team.name,
+    note: 'Team portal login'
+  });
+
+  saveState();
+  broadcastState();
   res.json({ ok: true, team: teamState(team) });
 });
 
@@ -803,7 +815,16 @@ app.post('/api/banker/requests/:requestId/reject', requireBanker, (req, res) => 
   request.status = 'rejected';
   request.decidedAt = nowIso();
   request.decidedBy = 'banker';
-  request.rejectionReason = typeof (req.body && req.body.reason) === 'string' ? req.body.reason.trim() : '';
+
+  state.transactions.push({
+    id: makeId('txn'),
+    timestamp: nowIso(),
+    type: request.action === 'deposit' ? 'team_portal_deposit_rejected' : 'team_portal_withdraw_rejected',
+    teamId: request.teamId,
+    teamName: request.teamName,
+    amount: request.action === 'deposit' ? Number(request.amount) : -Number(request.amount),
+    note: request.note || ''
+  });
 
   saveState();
   broadcastState();
@@ -829,13 +850,28 @@ app.get('/api/admin/export/results.xlsx', requireAdmin, (req, res) => {
     Timestamp: txn.timestamp || '',
     Type: txn.type || '',
     Team: txn.teamName || '',
+    TeamId: txn.teamId || '',
     Shape: txn.shapeName || '',
+    Amount: txn.amount ?? '',
     QuantityAccepted: txn.quantityAccepted ?? '',
     QuantityRejected: txn.quantityRejected ?? '',
     QuantityTraded: txn.quantityTraded ?? '',
     UnitPrice: txn.unitPrice ?? '',
     Total: txn.total ?? '',
     Note: txn.note || ''
+  }));
+
+  const bankerSheet = [...state.bankerRequests].map((request) => ({
+    RequestId: request.id || '',
+    Team: request.teamName || '',
+    TeamId: request.teamId || '',
+    Action: request.action || '',
+    Amount: request.amount ?? '',
+    Status: request.status || '',
+    RequestedAt: request.requestedAt || '',
+    DecidedAt: request.decidedAt || '',
+    DecidedBy: request.decidedBy || '',
+    Note: request.note || ''
   }));
 
   const roundsSheet = (state.rounds || []).map((round) => ({
@@ -851,6 +887,7 @@ app.get('/api/admin/export/results.xlsx', requireAdmin, (req, res) => {
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(teamsSheet), 'Teams');
   XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(txSheet), 'Transactions');
+  XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(bankerSheet), 'Banker Requests');
   XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(roundsSheet), 'Rounds');
 
   const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });

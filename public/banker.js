@@ -119,12 +119,9 @@ bankerPendingList.addEventListener('click', async (event) => {
     }
 
     if (action === 'reject') {
-      const reason = window.prompt('Optional rejection reason', '');
-      if (reason === null) return;
       await fetch(`/api/banker/requests/${id}/reject`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...(bankerKey ? { 'x-banker-key': bankerKey } : {}) },
-        body: JSON.stringify({ reason })
+        headers: { 'Content-Type': 'application/json', ...(bankerKey ? { 'x-banker-key': bankerKey } : {}) }
       }).then(async (response) => {
         const data = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(data.error || 'Reject failed');

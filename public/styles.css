@@ -643,6 +643,13 @@ button.winner-btn {
   align-items: center;
 }
 
+.team-logout-btn {
+  min-width: 150px;
+  min-height: 64px;
+  font-size: 1.05rem;
+  padding: 16px 22px;
+}
+
 .team-metrics {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -769,6 +776,10 @@ button.winner-btn {
 
   .team-metrics {
     grid-template-columns: 1fr;
+  }
+
+  .team-logout-btn {
+    width: 100%;
   }
 
   .countries-grid {
