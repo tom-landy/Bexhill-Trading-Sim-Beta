@@ -10,8 +10,13 @@ const undoAssignBtn = document.getElementById('undoAssignBtn');
 const assignmentDisplay = document.getElementById('assignmentDisplay');
 const assignmentSubtext = document.getElementById('assignmentSubtext');
 const assignmentPanel = document.getElementById('assignmentPanel');
+const seatingNav = document.getElementById('seatingNav');
+const seatingSetupCard = document.getElementById('seatingSetupCard');
+const seatingSummaryCard = document.getElementById('seatingSummaryCard');
 
 const STORAGE_KEY = 'seating-plan-state-v1';
+const params = new URLSearchParams(window.location.search);
+const kioskMode = params.get('kiosk') === '1';
 const GROUP_LABELS = [
   'Red 1', 'Red 2', 'Red 3', 'Red 4',
   'Blue 1', 'Blue 2', 'Blue 3', 'Blue 4',
@@ -267,4 +272,11 @@ if (existingState && Array.isArray(existingState.tables) && Array.isArray(existi
   renderState(existingState);
 } else {
   generatePlan();
+}
+
+if (kioskMode) {
+  document.body.classList.add('seating-kiosk-mode');
+  if (seatingNav) seatingNav.classList.add('hidden');
+  if (seatingSetupCard) seatingSetupCard.classList.add('hidden');
+  if (seatingSummaryCard) seatingSummaryCard.classList.add('hidden');
 }

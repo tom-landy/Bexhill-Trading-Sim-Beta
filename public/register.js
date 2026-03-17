@@ -8,6 +8,7 @@ const registerTimer = document.getElementById('registerTimer');
 
 const STORAGE_KEY = 'trading-sim-registered-team';
 const LOCK_KEY = 'trading-sim-register-lock-until';
+const RESET_MARKER_KEY = 'trading-sim-registration-reset-marker';
 const LOCK_MS = 2 * 60 * 1000;
 
 function readSavedTeam() {
@@ -36,6 +37,14 @@ function setLockUntil(timestamp) {
 
 function clearLock() {
   localStorage.removeItem(LOCK_KEY);
+}
+
+function readResetMarker() {
+  return localStorage.getItem(RESET_MARKER_KEY) || '';
+}
+
+function saveResetMarker(marker) {
+  localStorage.setItem(RESET_MARKER_KEY, marker);
 }
 
 function setStatus(message) {
@@ -77,13 +86,22 @@ function updateRegistrationAvailability() {
 }
 
 async function syncSavedTeamWithServer() {
-  const savedTeam = readSavedTeam();
-  if (!savedTeam || !savedTeam.id) return;
-
   try {
     const response = await fetch('/api/state');
     if (!response.ok) return;
     const data = await response.json();
+    const serverResetMarker = String(data.meta && data.meta.registrationResetAt || '');
+    const localResetMarker = readResetMarker();
+
+    if (serverResetMarker && serverResetMarker !== localResetMarker) {
+      clearTeam();
+      clearLock();
+      saveResetMarker(serverResetMarker);
+    }
+
+    const savedTeam = readSavedTeam();
+    if (!savedTeam || !savedTeam.id) return;
+
     const teams = Array.isArray(data.teams) ? data.teams : [];
     const exists = teams.some((team) => team.id === savedTeam.id);
 
@@ -192,4 +210,5 @@ syncSavedTeamWithServer().finally(() => {
   renderSavedTeam();
   updateRegistrationAvailability();
   window.setInterval(updateRegistrationAvailability, 1000);
+  window.setInterval(syncSavedTeamWithServer, 15000);
 });

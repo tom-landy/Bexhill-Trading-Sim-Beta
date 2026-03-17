@@ -185,6 +185,7 @@ function defaultState() {
       revealWinner: false,
       winnerTeamId: '',
       winnerName: '',
+      registrationResetAt: nowIso(),
       updatedAt: nowIso()
     },
     shapes: defaultShapes(),
@@ -1341,6 +1342,7 @@ app.post('/api/admin/reset', requireAdmin, (req, res) => {
     transactions: []
   };
   applyRoundPrices(resetRound);
+  state.meta.registrationResetAt = nowIso();
 
   saveState();
   broadcastState();
