@@ -24,6 +24,8 @@ const FLAG_CANVAS_HEIGHT = 400;
 const ctx = flagCanvas.getContext('2d');
 let isDrawing = false;
 let canvasDirty = false;
+let dragPlacement = null;
+let canvasSnapshot = null;
 
 function readSavedTeam() {
   try {
@@ -69,6 +71,15 @@ function markCanvasDirty() {
   canvasDirty = true;
 }
 
+function snapshotCanvas() {
+  return ctx.getImageData(0, 0, FLAG_CANVAS_WIDTH, FLAG_CANVAS_HEIGHT);
+}
+
+function restoreCanvas(snapshot) {
+  if (!snapshot) return;
+  ctx.putImageData(snapshot, 0, 0);
+}
+
 function canvasPosition(event) {
   const rect = flagCanvas.getBoundingClientRect();
   return {
@@ -81,6 +92,8 @@ function resetCanvas() {
   ctx.fillStyle = flagBackground.value;
   ctx.fillRect(0, 0, FLAG_CANVAS_WIDTH, FLAG_CANVAS_HEIGHT);
   canvasDirty = false;
+  dragPlacement = null;
+  canvasSnapshot = null;
 }
 
 function drawShape(tool, x, y) {
@@ -125,8 +138,10 @@ function beginDrawing(event) {
   const { x, y } = canvasPosition(event);
 
   if (tool !== 'draw') {
+    dragPlacement = { tool, x, y };
+    canvasSnapshot = snapshotCanvas();
     drawShape(tool, x, y);
-    markCanvasDirty();
+    flagCanvas.setPointerCapture(event.pointerId);
     return;
   }
 
@@ -142,6 +157,15 @@ function beginDrawing(event) {
 }
 
 function continueDrawing(event) {
+  if (flagTool.value !== 'draw' && dragPlacement) {
+    const { x, y } = canvasPosition(event);
+    dragPlacement.x = x;
+    dragPlacement.y = y;
+    restoreCanvas(canvasSnapshot);
+    drawShape(dragPlacement.tool, x, y);
+    return;
+  }
+
   if (!isDrawing || flagTool.value !== 'draw') return;
   const { x, y } = canvasPosition(event);
   ctx.lineTo(x, y);
@@ -149,6 +173,14 @@ function continueDrawing(event) {
 }
 
 function endDrawing(event) {
+  if (dragPlacement && flagTool.value !== 'draw') {
+    restoreCanvas(canvasSnapshot);
+    drawShape(dragPlacement.tool, dragPlacement.x, dragPlacement.y);
+    markCanvasDirty();
+    dragPlacement = null;
+    canvasSnapshot = null;
+  }
+
   if (isDrawing && flagTool.value === 'draw') {
     ctx.closePath();
   }
