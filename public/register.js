@@ -19,8 +19,8 @@ const STORAGE_KEY = 'trading-sim-registered-team';
 const LOCK_KEY = 'trading-sim-register-lock-until';
 const RESET_MARKER_KEY = 'trading-sim-registration-reset-marker';
 const LOCK_MS = 2 * 60 * 1000;
-const FLAG_CANVAS_WIDTH = 640;
-const FLAG_CANVAS_HEIGHT = 400;
+const FLAG_CANVAS_WIDTH = 960;
+const FLAG_CANVAS_HEIGHT = 600;
 
 const ctx = flagCanvas.getContext('2d');
 let isDrawing = false;

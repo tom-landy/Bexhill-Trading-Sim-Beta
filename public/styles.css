@@ -61,11 +61,11 @@ h3 {
 }
 
 .register-layout {
-  max-width: 980px;
+  max-width: 1320px;
   margin: 0 auto;
   padding: 20px 18px 48px;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.75fr);
   gap: 18px;
 }
 
@@ -88,6 +88,7 @@ h3 {
 
 .flag-canvas {
   width: 100%;
+  min-height: min(68vh, 760px);
   aspect-ratio: 16 / 10;
   border: 2px solid var(--border);
   border-radius: 14px;
