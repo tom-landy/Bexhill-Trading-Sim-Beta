@@ -5,11 +5,25 @@ const registerStatus = document.getElementById('registerStatus');
 const registeredTeamCard = document.getElementById('registeredTeamCard');
 const registerEmpty = document.getElementById('registerEmpty');
 const registerTimer = document.getElementById('registerTimer');
+const flagCanvas = document.getElementById('flagCanvas');
+const flagTool = document.getElementById('flagTool');
+const flagBackground = document.getElementById('flagBackground');
+const flagColor = document.getElementById('flagColor');
+const flagBrushSize = document.getElementById('flagBrushSize');
+const flagText = document.getElementById('flagText');
+const clearFlagBtn = document.getElementById('clearFlagBtn');
+const fillBackgroundBtn = document.getElementById('fillBackgroundBtn');
 
 const STORAGE_KEY = 'trading-sim-registered-team';
 const LOCK_KEY = 'trading-sim-register-lock-until';
 const RESET_MARKER_KEY = 'trading-sim-registration-reset-marker';
 const LOCK_MS = 2 * 60 * 1000;
+const FLAG_CANVAS_WIDTH = 640;
+const FLAG_CANVAS_HEIGHT = 400;
+
+const ctx = flagCanvas.getContext('2d');
+let isDrawing = false;
+let canvasDirty = false;
 
 function readSavedTeam() {
   try {
@@ -49,6 +63,105 @@ function saveResetMarker(marker) {
 
 function setStatus(message) {
   registerStatus.textContent = message;
+}
+
+function markCanvasDirty() {
+  canvasDirty = true;
+}
+
+function canvasPosition(event) {
+  const rect = flagCanvas.getBoundingClientRect();
+  return {
+    x: ((event.clientX - rect.left) / rect.width) * FLAG_CANVAS_WIDTH,
+    y: ((event.clientY - rect.top) / rect.height) * FLAG_CANVAS_HEIGHT
+  };
+}
+
+function resetCanvas() {
+  ctx.fillStyle = flagBackground.value;
+  ctx.fillRect(0, 0, FLAG_CANVAS_WIDTH, FLAG_CANVAS_HEIGHT);
+  canvasDirty = false;
+}
+
+function drawShape(tool, x, y) {
+  const size = Number(flagBrushSize.value) * 4;
+  ctx.fillStyle = flagColor.value;
+  ctx.strokeStyle = flagColor.value;
+  ctx.lineWidth = 4;
+
+  if (tool === 'rectangle') {
+    ctx.fillRect(x - size, y - size * 0.6, size * 2, size * 1.2);
+    return;
+  }
+
+  if (tool === 'circle') {
+    ctx.beginPath();
+    ctx.arc(x, y, size, 0, Math.PI * 2);
+    ctx.fill();
+    return;
+  }
+
+  if (tool === 'triangle') {
+    ctx.beginPath();
+    ctx.moveTo(x, y - size);
+    ctx.lineTo(x + size, y + size);
+    ctx.lineTo(x - size, y + size);
+    ctx.closePath();
+    ctx.fill();
+    return;
+  }
+
+  if (tool === 'text') {
+    const value = flagText.value.trim() || 'TEAM';
+    ctx.font = `${Math.max(26, size * 1.2)}px "Space Grotesk", sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(value, x, y);
+  }
+}
+
+function beginDrawing(event) {
+  const tool = flagTool.value;
+  const { x, y } = canvasPosition(event);
+
+  if (tool !== 'draw') {
+    drawShape(tool, x, y);
+    markCanvasDirty();
+    return;
+  }
+
+  isDrawing = true;
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.strokeStyle = flagColor.value;
+  ctx.lineWidth = Number(flagBrushSize.value);
+  flagCanvas.setPointerCapture(event.pointerId);
+  markCanvasDirty();
+}
+
+function continueDrawing(event) {
+  if (!isDrawing || flagTool.value !== 'draw') return;
+  const { x, y } = canvasPosition(event);
+  ctx.lineTo(x, y);
+  ctx.stroke();
+}
+
+function endDrawing(event) {
+  if (isDrawing && flagTool.value === 'draw') {
+    ctx.closePath();
+  }
+  isDrawing = false;
+  if (event && event.pointerId !== undefined) {
+    flagCanvas.releasePointerCapture(event.pointerId);
+  }
+}
+
+function canvasToBlob() {
+  return new Promise((resolve) => {
+    flagCanvas.toBlob((blob) => resolve(blob), 'image/png');
+  });
 }
 
 function maskSecret(secret) {
@@ -184,8 +297,15 @@ registerForm.addEventListener('submit', async (event) => {
   try {
     const formData = new FormData();
     formData.append('name', registerName.value.trim());
-    const file = registerImage.files && registerImage.files[0];
-    if (file) formData.append('image', file);
+    if (canvasDirty) {
+      const blob = await canvasToBlob();
+      if (blob) {
+        formData.append('image', blob, 'flag-maker.png');
+      }
+    } else {
+      const file = registerImage.files && registerImage.files[0];
+      if (file) formData.append('image', file);
+    }
 
     const response = await fetch('/api/public/teams', {
       method: 'POST',
@@ -198,6 +318,7 @@ registerForm.addEventListener('submit', async (event) => {
     saveTeam(data.team);
     setLockUntil(Date.now() + LOCK_MS);
     registerForm.reset();
+    resetCanvas();
     renderSavedTeam();
     updateRegistrationAvailability();
     setStatus(`Team created. Save the PIN for ${data.team.name}.`);
@@ -206,7 +327,24 @@ registerForm.addEventListener('submit', async (event) => {
   }
 });
 
+flagCanvas.addEventListener('pointerdown', beginDrawing);
+flagCanvas.addEventListener('pointermove', continueDrawing);
+flagCanvas.addEventListener('pointerup', endDrawing);
+flagCanvas.addEventListener('pointerleave', endDrawing);
+flagCanvas.addEventListener('pointercancel', endDrawing);
+
+clearFlagBtn.addEventListener('click', () => {
+  resetCanvas();
+});
+
+fillBackgroundBtn.addEventListener('click', () => {
+  ctx.fillStyle = flagBackground.value;
+  ctx.fillRect(0, 0, FLAG_CANVAS_WIDTH, FLAG_CANVAS_HEIGHT);
+  markCanvasDirty();
+});
+
 syncSavedTeamWithServer().finally(() => {
+  resetCanvas();
   renderSavedTeam();
   updateRegistrationAvailability();
   window.setInterval(updateRegistrationAvailability, 1000);

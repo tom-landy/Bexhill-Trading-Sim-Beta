@@ -23,10 +23,50 @@
       <div class="section-header">
         <h1>Register Your Team</h1>
       </div>
-      <p class="list-sub">Enter your team name and upload an image. The system will generate the team PIN automatically.</p>
+      <p class="list-sub">Enter your team name and either upload an image or create a flag below. The system will generate the team PIN automatically.</p>
       <form id="registerForm" class="stack-form" enctype="multipart/form-data">
         <input id="registerName" name="name" placeholder="Team name" required />
         <input id="registerImage" name="image" type="file" accept="image/png,image/jpeg,image/gif,image/webp" />
+        <p class="list-sub">If you draw a flag below, the drawing will be used instead of the uploaded image.</p>
+
+        <section class="flag-maker">
+          <div class="section-header">
+            <h2>Flag Maker</h2>
+          </div>
+          <div class="flag-tools">
+            <label>
+              <strong>Tool</strong>
+              <select id="flagTool">
+                <option value="draw">Draw</option>
+                <option value="rectangle">Rectangle</option>
+                <option value="circle">Circle</option>
+                <option value="triangle">Triangle</option>
+                <option value="text">Text</option>
+              </select>
+            </label>
+            <label>
+              <strong>Background</strong>
+              <input id="flagBackground" type="color" value="#ffffff" />
+            </label>
+            <label>
+              <strong>Colour</strong>
+              <input id="flagColor" type="color" value="#d62828" />
+            </label>
+            <label>
+              <strong>Brush</strong>
+              <input id="flagBrushSize" type="range" min="2" max="24" step="1" value="8" />
+            </label>
+          </div>
+          <div class="flag-tools">
+            <label class="flag-text-control">
+              <strong>Text</strong>
+              <input id="flagText" type="text" maxlength="20" placeholder="Add text to the flag" />
+            </label>
+            <button id="fillBackgroundBtn" type="button" class="ghost-button">Fill Background</button>
+            <button id="clearFlagBtn" type="button" class="ghost-button">Clear Flag</button>
+          </div>
+          <canvas id="flagCanvas" class="flag-canvas" width="640" height="400"></canvas>
+        </section>
         <button type="submit">Create Team</button>
       </form>
       <p id="registerStatus" class="status-text"></p>

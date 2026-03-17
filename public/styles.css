@@ -69,6 +69,33 @@ h3 {
   gap: 18px;
 }
 
+.flag-maker {
+  margin-top: 10px;
+  display: grid;
+  gap: 12px;
+}
+
+.flag-tools {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  align-items: end;
+}
+
+.flag-text-control {
+  grid-column: span 2;
+}
+
+.flag-canvas {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  background: #fff;
+  touch-action: none;
+  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.06);
+}
+
 .seating-layout {
   max-width: 1400px;
   margin: 0 auto;
@@ -750,6 +777,14 @@ button.winner-btn {
     grid-template-columns: 1fr;
   }
 
+  .flag-tools {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .flag-text-control {
+    grid-column: span 2;
+  }
+
   .seating-layout {
     grid-template-columns: 1fr;
   }
@@ -813,6 +848,14 @@ button.winner-btn {
 
   .seating-grid {
     grid-template-columns: 1fr;
+  }
+
+  .flag-tools {
+    grid-template-columns: 1fr;
+  }
+
+  .flag-text-control {
+    grid-column: span 1;
   }
 
   .seating-assign-card {
